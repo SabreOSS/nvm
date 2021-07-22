@@ -117,15 +117,15 @@ nvm_get_latest() {
 
 nvm_download() {
   local CURL_COMPRESSED_FLAG
-  [[ -z "${MIRROR_USER}" ]] || CURL_MIRROR_AUTH="-u ${MIRROR_USER}:${MIRROR_PASSWORD}"
-  [[ -z "${MIRROR_USER}" ]] || WGET_MIRROR_USER="--user ${MIRROR_USER}"
-  [[ -z "${MIRROR_PASSWORD}" ]] || WGET_MIRROR_PASSWORD="--password ${MIRROR_PASSWORD}"
-  WGET_MIRROR_AUTH="${WGET_MIRROR_USER} ${WGET_MIRROR_PASSWORD}"
+  [[ -z "${NVM_REPO_AUTH_USER}" ]] || CURL_REPO_AUTH="-u ${NVM_REPO_AUTH_USER}:${NVM_REPO_AUTH_PASSWORD}"
+  [[ -z "${NVM_REPO_AUTH_USER}" ]] || WGET_REPO_AUTH_USER="--user ${NVM_REPO_AUTH_USER}"
+  [[ -z "${NVM_REPO_AUTH_PASSWORD}" ]] || WGET_REPO_AUTH_PASSWORD="--password ${NVM_REPO_AUTH_PASSWORD}"
+  WGET_REPO_AUTH="${WGET_REPO_AUTH_USER} ${WGET_REPO_AUTH_PASSWORD}"
   if nvm_has "curl"; then
     if nvm_curl_use_compression; then
       CURL_COMPRESSED_FLAG="--compressed"
     fi
-    curl --fail ${CURL_COMPRESSED_FLAG:-} ${CURL_MIRROR_AUTH:-} -q "$@"
+    curl --fail ${CURL_COMPRESSED_FLAG:-} ${CURL_REPO_AUTH:-} -q "$@"
   elif nvm_has "wget"; then
     # Emulate curl with wget
     ARGS=$(nvm_echo "$@" | command sed -e 's/--progress-bar /--progress=bar /' \
@@ -138,7 +138,7 @@ nvm_download() {
                             -e 's/-o /-O /' \
                             -e 's/-C - /-c /')
     # shellcheck disable=SC2086
-    eval wget ${WGET_MIRROR_AUTH} $ARGS
+    eval wget ${WGET_REPO_AUTH} $ARGS
   fi
 }
 
